@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Revisão - Carretas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h2>🚛 Revisão de Implementos (30 Dias)</h2>
+    
+    <div class="painel-resumo">
+        <div class="card-resumo">
+            <span class="titulo-card">Total de Carretas</span>
+            <span id="totalVendas" class="valor-card">0</span>
+        </div>
+        <div class="card-resumo alerta">
+            <span class="titulo-card">Revisões Vencidas</span>
+            <span id="totalVencidas" class="valor-card">0</span>
+        </div>
+    </div>
+
+    <div class="form-grupo">
+        <input type="text" id="nomeCliente" placeholder="Nome do Cliente">
+        <input type="text" id="placaCarreta" placeholder="Placa (Ex: ABC1D23)" style="text-transform: uppercase;">
+        <input type="text" id="telCliente" placeholder="WhatsApp (DDD + Número)">
+        <input type="date" id="dataVenda">
+        <button class="btn-salvar" onclick="adicionarCliente()">Registrar Saída</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Placa</th>
+                <th>WhatsApp</th>
+                <th>Venda</th>
+                <th>Revisão</th>
+                <th>Status</th>
+                <th>Aviso</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody id="corpoTabela"></tbody>
+    </table>
+</div>
+<div style="margin-bottom: 15px;">
+    <input type="text" id="buscaPlaca" placeholder="🔍 Digite uma placa para buscar..." 
+           onkeyup="filtrarTabela()" 
+           style="width: 100%; padding: 12px; border: 2px solid #003366; border-radius: 8px; text-transform: uppercase;">
+</div>
+<table>
+    <thead>
+    <tr>
+        <th>Cliente</th>
+        <th>Placa</th>
+        <th>Venda</th>
+        <th>Revisão</th>
+        <th>Status</th> <th>Aviso</th>
+        <th>Ação</th>
+    </tr>
+</thead>
+    <tbody id="corpoTabela"></tbody>
+</table>
+</div>
+<script type="module">
+    // IMPORTANTE: Adicionei 'query' e 'orderBy' aqui dentro
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+       apiKey: "AIzaSyAmsrR9ME2mW61m5M8d2pEzMQsjN0sxgbU",
+  authDomain: "chat-privado-d00e2.firebaseapp.com",
+  databaseURL: "https://chat-privado-d00e2-default-rtdb.firebaseio.com",
+  projectId: "chat-privado-d00e2",
+  storageBucket: "chat-privado-d00e2.firebasestorage.app",
+  messagingSenderId: "952820411006",
+  appId: "1:952820411006:web:22255435d5d00863bc862f",
+  measurementId: "G-095T6T72C3"
+      };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Disponibiliza para o script.js
+    window.db = db;
+    window.fs = { collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy };
+</script>
+
+<script src="script.js" type="module"></script>
+    
+</body>
+
+</html>
