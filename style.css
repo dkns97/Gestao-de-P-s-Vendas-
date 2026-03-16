@@ -164,3 +164,11 @@ th {
 .card-resumo.alerta .valor-card {
     color: #cc0000;
 }
+thead th {
+    background-color: #003366 !important; /* Azul Randon */
+    color: #ffffff !important;           /* Letras Brancas */
+    font-weight: bold;
+    padding: 12px;
+    text-transform: uppercase;
+    border: 1px solid #002244;
+}
