@@ -172,3 +172,30 @@ thead th {
     text-transform: uppercase;
     border: 1px solid #002244;
 }
+.acoes-contato {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.btn-check {
+    background-color: #f0f0f0;
+    color: #444;
+    border: 1px solid #ccc;
+    padding: 5px;
+    border-radius: 4px;
+    font-size: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+
+.btn-check:hover {
+    background-color: #ddd;
+}
+
+/* Estilo para quando a linha for marcada */
+tr.contatado {
+    background-color: #d4edda !important; /* Verde Randon Suave */
+}

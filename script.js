@@ -61,6 +61,7 @@ onSnapshot(q, (snapshot) => {
         const c = docSnap.data();
         const id = docSnap.id;
         contadorTotal++;
+        const btnCheck = `<button class="btn-check" onclick="window.marcarContato(this)">✔️ Marcar Contato</button>`;
 
         // --- CÁLCULO DAS DATAS (30 DIAS) ---
         const dataVendaObj = new Date(c.dataVenda + "T12:00:00");
@@ -85,25 +86,26 @@ onSnapshot(q, (snapshot) => {
 
         // --- DESENHO DA LINHA NA TABELA (COM COR AZUL RANDON NO TEXTO) ---
         const linha = `
-            <tr>
-                <td>${c.nome}</td>
-                <td><strong>${c.placa}</strong></td>
-                <td>${c.telefone}</td>
-                <td>${dataVendaObj.toLocaleDateString('pt-BR')}</td>
-                <td>${dataRevFormatada}</td>
-                <td>${statusHTML}</td>
-                <td>
-                    <a href="${linkZap}" target="_blank" class="btn-zap">
-                        Avisar Cliente
-                    </a>
-                </td>
-                <td>
-                    <button class="btn-excluir" onclick="window.excluirCliente('${id}')">
-                        Apagar
-                    </button>
-                </td>
-            </tr>
-        `;
+            <tr id="linha-${id}">
+        <td>${c.nome}</td>
+        <td><strong>${c.placa}</strong></td>
+        <td>${c.telefone}</td>
+        <td>${dataVendaObj.toLocaleDateString('pt-BR')}</td>
+        <td>${dataRevFormatada}</td>
+        <td>${statusHTML}</td>
+        <td class="acoes-contato">
+            <a href="${linkZap}" target="_blank" class="btn-zap" onclick="window.marcarContato(this)">
+                Enviar Aviso
+            </a>
+            ${btnCheck}
+        </td>
+        <td>
+            <button class="btn-excluir" onclick="window.excluirCliente('${id}')">
+                Apagar
+            </button>
+        </td>
+    </tr>
+`;
         tabela.innerHTML += linha;
     });
 
@@ -139,5 +141,21 @@ window.filtrarTabela = function() {
                 linhas[i].style.display = "none";
             }
         }
+    }
+}
+window.marcarContato = function(elemento) {
+    // Acha a linha (tr) onde o botão foi clicado
+    const linha = elemento.closest('tr');
+    
+    // Aplica um estilo visual de "concluído"
+    linha.style.opacity = "0.5"; // Deixa a linha meio transparente
+    linha.style.backgroundColor = "#e8f5e9"; // Fundo verdinho claro
+    
+    // Muda o texto do botão de check
+    const btn = linha.querySelector('.btn-check');
+    if(btn) {
+        btn.innerHTML = "✅ Contatado";
+        btn.style.backgroundColor = "#2e7d32";
+        btn.style.color = "white";
     }
 }
