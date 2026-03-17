@@ -199,3 +199,24 @@ thead th {
 tr.contatado {
     background-color: #d4edda !important; /* Verde Randon Suave */
 }
+
+.acoes-contato {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.btn-check {
+    background-color: #eee;
+    border: 1px solid #ccc;
+    font-size: 10px;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 4px;
+    color: #333;
+    font-weight: bold;
+}
+
+.btn-check:hover {
+    background-color: #d4edda;
+}
