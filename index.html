@@ -30,67 +30,53 @@
         <button class="btn-salvar" onclick="adicionarCliente()">Registrar Saída</button>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Cliente</th>
-                <th>Placa</th>
-                <th>WhatsApp</th>
-                <th>Venda</th>
-                <th>Revisão</th>
-                <th>Status</th>
-                <th>Aviso</th>
-                <th>Ação</th>
-            </tr>
-        </thead>
-        <tbody id="corpoTabela"></tbody>
-    </table>
+    <div class="container-busca">
+        <input type="text" id="buscaPlaca" placeholder="🔍 Digite uma placa para buscar..." onkeyup="filtrarTabela()">
+    </div>
+
+    <div class="tabela-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 15%;">Cliente</th>
+                    <th style="width: 10%;">Placa</th>
+                    <th style="width: 12%;">WhatsApp</th>
+                    <th style="width: 10%;">1ª Rev</th>
+                    <th style="width: 10%;">2ª Rev</th>
+                    <th style="width: 10%;">Status</th>
+                    <th style="width: 23%;">Aviso</th>
+                    <th style="width: 10%;">Ação</th>
+                </tr>
+            </thead>
+            <tbody id="corpoTabela">
+                </tbody>
+        </table>
+    </div>
 </div>
-<div style="margin-bottom: 15px;">
-    <input type="text" id="buscaPlaca" placeholder="🔍 Digite uma placa para buscar..." 
-           onkeyup="filtrarTabela()" 
-           style="width: 100%; padding: 12px; border: 2px solid #003366; border-radius: 8px; text-transform: uppercase;">
-</div>
-<table>
-    <thead>
-    <tr>
-        <th>Cliente</th>
-        <th>Placa</th>
-        <th>Venda</th>
-        <th>Revisão</th>
-        <th>Status</th> <th>Aviso</th>
-        <th>Ação</th>
-    </tr>
-</thead>
-    <tbody id="corpoTabela"></tbody>
-</table>
-</div>
+
 <script type="module">
-    // IMPORTANTE: Adicionei 'query' e 'orderBy' aqui dentro
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
-       apiKey: "AIzaSyAmsrR9ME2mW61m5M8d2pEzMQsjN0sxgbU",
-  authDomain: "chat-privado-d00e2.firebaseapp.com",
-  databaseURL: "https://chat-privado-d00e2-default-rtdb.firebaseio.com",
-  projectId: "chat-privado-d00e2",
-  storageBucket: "chat-privado-d00e2.firebasestorage.app",
-  messagingSenderId: "952820411006",
-  appId: "1:952820411006:web:22255435d5d00863bc862f",
-  measurementId: "G-095T6T72C3"
-      };
+        apiKey: "AIzaSyAmsrR9ME2mW61m5M8d2pEzMQsjN0sxgbU",
+        authDomain: "chat-privado-d00e2.firebaseapp.com",
+        databaseURL: "https://chat-privado-d00e2-default-rtdb.firebaseio.com",
+        projectId: "chat-privado-d00e2",
+        storageBucket: "chat-privado-d00e2.firebasestorage.app",
+        messagingSenderId: "952820411006",
+        appId: "1:952820411006:web:22255435d5d00863bc862f",
+        measurementId: "G-095T6T72C3"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Disponibiliza para o script.js
     window.db = db;
-    window.fs = { collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy };
+    window.fs = { collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy, updateDoc };
 </script>
 
 <script src="script.js" type="module"></script>
     
 </body>
-
 </html>

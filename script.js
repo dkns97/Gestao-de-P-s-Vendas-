@@ -1,9 +1,8 @@
 const { collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, query, orderBy } = window.fs;
 const db = window.db;
-
 const clientesRef = collection(db, "clientes_carretas");
 
-// FUNÇÃO PARA CADASTRAR
+// 1. ADICIONAR CLIENTE
 window.adicionarCliente = async function() {
     const nome = document.getElementById('nomeCliente').value;
     const placa = document.getElementById('placaCarreta').value.toUpperCase();
@@ -11,27 +10,31 @@ window.adicionarCliente = async function() {
     const data = document.getElementById('dataVenda').value;
 
     if (!nome || !placa || !tel || !data) {
-        return alert("Preencha todos os campos!");
+        return alert("Por favor, preencha todos os campos!");
     }
 
     try {
         await addDoc(clientesRef, {
-            nome: nome,
-            placa: placa,
+            nome,
+            placa,
             telefone: tel,
             dataVenda: data,
-            contatado: false, // NOVO: Começa como não contatado
+            contatado: false,
             criadoEm: new Date()
         });
-        alert("Carreta registrada!");
-        document.querySelectorAll('input').forEach(i => i.value = "");
-    } catch (e) { alert("Erro ao salvar."); }
+        alert("Sucesso! Carreta cadastrada.");
+        // Limpa os campos
+        document.getElementById('nomeCliente').value = "";
+        document.getElementById('placaCarreta').value = "";
+        document.getElementById('telCliente').value = "";
+        document.getElementById('dataVenda').value = "";
+    } catch (e) { 
+        alert("Erro ao salvar dados."); 
+    }
 }
 
-// LISTAGEM COM MEMÓRIA DE CONTATO
-const q = query(clientesRef, orderBy("criadoEm", "desc"));
-
-onSnapshot(q, (snapshot) => {
+// 2. LISTAGEM EM TEMPO REAL
+onSnapshot(query(clientesRef, orderBy("criadoEm", "desc")), (snapshot) => {
     const tabela = document.getElementById('corpoTabela');
     const totalVendas = document.getElementById('totalVendas');
     const totalVencidas = document.getElementById('totalVencidas');
@@ -45,54 +48,78 @@ onSnapshot(q, (snapshot) => {
         const id = docSnap.id;
         contVendas++;
 
+        // Cálculos de Revisão
         const dataVendaObj = new Date(c.dataVenda + "T12:00:00");
-        const dataRevisao = new Date(dataVendaObj);
-        dataRevisao.setDate(dataRevisao.getDate() + 30);
-        
+        const rev1 = new Date(dataVendaObj);
+        rev1.setDate(rev1.getDate() + 30);
+        const rev2 = new Date(dataVendaObj);
+        rev2.setDate(rev2.getDate() + 120);
+
         const hoje = new Date();
         hoje.setHours(0,0,0,0);
-        const vencido = hoje >= dataRevisao;
-        if (vencido) contVencidas++;
+        const vencido = hoje >= rev1;
+        if (vencido && !c.contatado) contVencidas++;
 
-        const statusHTML = vencido ? '<span class="status-alerta">⚠️ VENCIDA</span>' : '<span class="status-ok">✅ NO PRAZO</span>';
+        // Status
+        const statusHTML = vencido ? '<span class="status-alerta">⚠️ REVISÃO</span>' : '<span class="status-ok">✅ EM DIA</span>';
         
-        // MENSAGEM WHATSAPP
-        const msg = `Olá ${c.nome}! A revisão de 30 dias da carreta ${c.placa} está próxima. Vamos agendar?`;
-        const linkZap = `https://wa.me/55${c.tel}?text=${encodeURIComponent(msg)}`;
+        // Estilo da linha (marcar como contatado)
+        const classeLinha = c.contatado ? 'class="contatado"' : '';
 
-        // LÓGICA DE ESTILO PARA LINHA CONTATADA
-        const estiloContatado = c.contatado ? 'style="background-color: #e8f5e9; opacity: 0.8;"' : '';
-        const textoBotao = c.contatado ? "✅ CONTATADO" : "✔️ MARCAR CONTATO";
+        // Link WhatsApp
+        const msg = `Olá ${c.nome}! Acompanhando a garantia da sua carreta placa ${c.placa}, seguem as datas das suas revisões:\n\n📍 1ª Revisão (30 dias): ${rev1.toLocaleDateString('pt-BR')}\n📍 2ª Revisão (120 dias): ${rev2.toLocaleDateString('pt-BR')}\n\nPodemos agendar?`;
+        const linkZap = `https://wa.me/55${c.telefone}?text=${encodeURIComponent(msg)}`;
 
-        const linha = `
-            <tr ${estiloContatado}>
-                <td>${c.nome}</td>
-                <td><strong>${c.placa}</strong></td>
-                <td>${c.telefone}</td>
-                <td>${dataVendaObj.toLocaleDateString('pt-BR')}</td>
-                <td>${dataRevisao.toLocaleDateString('pt-BR')}</td>
-                <td>${statusHTML}</td>
-                <td class="acoes-contato">
+        // MONTAGEM DA LINHA (EXATAMENTE 8 TD'S)
+        const tr = document.createElement('tr');
+        if (c.contatado) tr.classList.add('contatado');
+
+        tr.innerHTML = `
+            <td>${c.nome}</td>
+            <td><strong>${c.placa}</strong></td>
+            <td>${c.telefone}</td>
+            <td>${rev1.toLocaleDateString('pt-BR')}</td>
+            <td>${rev2.toLocaleDateString('pt-BR')}</td>
+            <td>${statusHTML}</td>
+            <td>
+                <div class="acoes-contato">
                     <a href="${linkZap}" target="_blank" class="btn-zap" onclick="window.marcarComoFeito('${id}')">Avisar</a>
-                    <button class="btn-check" onclick="window.marcarComoFeito('${id}')">${textoBotao}</button>
-                </td>
-                <td><button class="btn-excluir" onclick="window.excluirCliente('${id}')">Apagar</button></td>
-            </tr>
+                    <button class="btn-check" onclick="window.marcarComoFeito('${id}')">${c.contatado ? '✅ OK' : '✔️ MARCAR'}</button>
+                </div>
+            </td>
+            <td>
+                <button class="btn-excluir" onclick="window.excluirCliente('${id}')">Apagar</button>
+            </td>
         `;
-        tabela.innerHTML += linha;
+        tabela.appendChild(tr);
     });
-    totalVendas.innerText = contVendas;
-    totalVencidas.innerText = contVencidas;
+
+    if(totalVendas) totalVendas.innerText = contVendas;
+    if(totalVencidas) totalVencidas.innerText = contVencidas;
 });
 
-// FUNÇÃO PARA SALVAR NO BANCO QUE JÁ FOI FEITO
+// 3. MARCAR COMO CONTATADO
 window.marcarComoFeito = async (id) => {
-    const docRef = doc(db, "clientes_carretas", id);
-    try {
-        await updateDoc(docRef, { contatado: true });
-    } catch (e) { console.error("Erro ao atualizar contato:", e); }
+    await updateDoc(doc(db, "clientes_carretas", id), { contatado: true });
 }
 
+// 4. EXCLUIR REGISTRO
 window.excluirCliente = async (id) => {
-    if (confirm("Excluir registro?")) await deleteDoc(doc(db, "clientes_carretas", id));
+    if (confirm("Excluir permanentemente?")) {
+        await deleteDoc(doc(db, "clientes_carretas", id));
+    }
+}
+
+// 5. FILTRAR TABELA
+window.filtrarTabela = function() {
+    const termo = document.getElementById('buscaPlaca').value.toUpperCase();
+    const linhas = document.getElementById('corpoTabela').getElementsByTagName('tr');
+
+    for (let i = 0; i < linhas.length; i++) {
+        const colunaPlaca = linhas[i].getElementsByTagName('td')[1]; 
+        if (colunaPlaca) {
+            const texto = colunaPlaca.textContent || colunaPlaca.innerText;
+            linhas[i].style.display = texto.toUpperCase().includes(termo) ? "" : "none";
+        }
+    }
 }
