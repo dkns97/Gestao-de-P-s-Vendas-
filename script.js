@@ -67,8 +67,20 @@ onSnapshot(query(clientesRef, orderBy("criadoEm", "desc")), (snapshot) => {
         const classeLinha = c.contatado ? 'class="contatado"' : '';
 
         // Link WhatsApp
-        const msg = `Olá ${c.nome}! Acompanhando a garantia da sua carreta placa ${c.placa}, seguem as datas das suas revisões:\n\n📍 1ª Revisão (30 dias): ${rev1.toLocaleDateString('pt-BR')}\n📍 2ª Revisão (120 dias): ${rev2.toLocaleDateString('pt-BR')}\n\nPodemos agendar?`;
-        const linkZap = `https://wa.me/55${c.telefone}?text=${encodeURIComponent(msg)}`;
+        // Dentro do seu onSnapshot, onde você monta a tabela:
+
+const consultorNome = c.consultor || "Consultor de Pós-Vendas"; // Nome que você salvou no Firebase
+
+const msg = `*Acompanhamento Técnico Randon* 🚛\n\n` +
+`Olá, *${c.nome}*! Aqui é o *${consultorNome}*.\n\n` +
+`Parabéns pela nova aquisição (Placa: *${c.placa}*). Para garantir a máxima performance e a validade da sua *Garantia Randon*, lembramos que a sua 1ª Revisão de 30 dias está prevista para:\n\n` +
+`📅 *Data: ${rev1.toLocaleDateString('pt-BR')}*\n\n` +
+`Esta etapa é essencial para o ajuste fino dos componentes e segurança operacional.
+Principalmente para o assentamento correto dos componentes, Garantindo a durabilidade e a segurança que só uma Randon oferece.
+Nosso time de Pós-Vendas está à disposição.\n\n` +
+`Podemos confirmar o agendamento?`;
+
+const linkZap = `https://wa.me/55${c.telefone}?text=${encodeURIComponent(msg)}`;
 
         // MONTAGEM DA LINHA (EXATAMENTE 8 TD'S)
         const tr = document.createElement('tr');

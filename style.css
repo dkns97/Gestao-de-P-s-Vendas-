@@ -21,6 +21,11 @@ body {
     box-shadow: 0 8px 25px #f7f5f5f7;
     zoom: 0.9; /* Menos zoom na página como solicitado */
 }
+h1 {
+    color: lch(1.82% 26.1 294.28);
+    text-align: left;
+    margin-left: 10px;
+}
 
 h2 {
     color: lab(94.18% -1.14 -0.96);
